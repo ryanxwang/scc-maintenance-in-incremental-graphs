@@ -1,8 +1,4 @@
-from distutils import errors
-from distutils.log import error
 import heapq
-import scc_maintainer
-from scc_maintainer.scc_maintainer import SCC_Maintainer
 
 class Vertex:
     def __init__(self, id: int, birthday: int):
@@ -25,7 +21,7 @@ class Edge:
         return self.birthday < other.birthday
 
 
-class TopoSearchSCCMaintainer(SCC_Maintainer):
+class TopoSearchSCCMaintainer():
     def __init__(self):
         self._time = 0
         self.unprocessed_vertices = []
@@ -51,6 +47,19 @@ class TopoSearchSCCMaintainer(SCC_Maintainer):
         if self.vertices[self.position[v]].root != v:
             self.vertices[self.position[v]].root = self.__find(self.vertices[self.position[v]].root)
         return self.vertices[self.position[v]].root
+
+    def __find_scc_dfs(self, u: Vertex, new_scc: set, seen: set, FIDs: list, BIDs: list) -> bool:
+        if u.id in seen:
+            return True
+        
+        seen.add(u.id)
+        for next in u.next:
+            if next not in FIDs and next not in BIDs:
+                continue
+
+            if self.__find_scc_dfs(self.vertices[self.position[next]], new_scc, seen, FIDs, BIDs):
+                new_scc.add(u.id)
+        return u.id in new_scc
 
     def __topological_search(self, u: Vertex, v: Vertex):
         F = []
@@ -109,6 +118,12 @@ class TopoSearchSCCMaintainer(SCC_Maintainer):
             for b in B:
                 if b.id in f.next:
                     hasCycle = True
+        
+        # prepare position k and the FIDs and BIDs lists for later use
+        if hasCycle:
+            k = i
+            FIDs = list(map(lambda x : x.id, F))
+            BIDs = list(map(lambda x : x.id, B))
 
         # reorder
         while len(F) != 0:
@@ -147,8 +162,40 @@ class TopoSearchSCCMaintainer(SCC_Maintainer):
         
         # if there is a cycle, merge, otherwise add edge
         if hasCycle:
-            raise ValueError("Has cycle")
-            # TODO implement this
+            new_scc = set([u.id])
+            self.__find_scc_dfs(v, new_scc, set([u.id]), FIDs, BIDs)
+            
+            # find the leader of this new SCC by age (lowest birthday)
+            leader = u
+            for id in new_scc:
+                if self.vertices[self.position[id]].birthday < leader.birthday:
+                    leader = self.vertices[self.position[id]]
+            
+            # transfer the edges of all the members to the leader
+            for id in new_scc:
+                if id == leader.id:
+                    continue
+                    
+                member = self.vertices[self.position[id]]
+                member.root = leader.id
+                for x in member.next:
+                    if x not in new_scc:
+                        leader.next.add(x)
+                        self.vertices[self.position[x]].prev.remove(id)
+                        self.vertices[self.position[x]].prev.add(leader.id)
+                for x in member.prev:
+                    if x not in new_scc:
+                        leader.prev.add(x)
+                        self.vertices[self.position[x]].next.remove(id)
+                        self.vertices[self.position[x]].next.add(leader.id)
+                member.prev = set()
+                member.next = set()
+
+            # swap the leader onto position k
+            leaderPos = self.position[leader.id]
+            self.position[self.vertices[k].id] = leaderPos
+            self.vertices[leaderPos], self.vertices[k] = self.vertices[k], self.vertices[leaderPos]
+            self.position[leader.id] = k
         else:
             self.vertices[self.position[u.id]].next.add(v.id)
             self.vertices[self.position[v.id]].prev.add(u.id)
@@ -177,7 +224,7 @@ class TopoSearchSCCMaintainer(SCC_Maintainer):
             self.__topological_search(self.vertices[self.position[u]], self.vertices[self.position[v]])
 
     def get_scc_count(self) -> int:
-        return len(list(map(lambda x: self.__find(x.id), self.vertices)))
+        return len(set(map(lambda x: self.__find(x.id), self.vertices)))
 
     def __add_vertex(self, v: Vertex) -> None:
         heapq.heappush(self.unprocessed_vertices, v)
@@ -199,14 +246,16 @@ class TopoSearchSCCMaintainer(SCC_Maintainer):
 
         self.__add_edge(Edge(u, v, birthday))
 
-# S = TopoSearchSCCMaintainer()
-# S.add_vertex(0, 0)
-# S.add_vertex(1, 1)
-# S.add_edge(1, 0, 1)
-# S.time = 1
-# S.add_vertex(2, 2)
-# S.add_edge(2, 1, 2)
-# S.add_edge(2, 0, 2)
-# S.add_edge(0, 2, 2)
-# S.time = 2
-# pass
+S = TopoSearchSCCMaintainer()
+S.add_vertex(0, 0)
+S.add_vertex(1, 1)
+S.add_edge(1, 0, 1)
+S.add_edge(0, 1, 1)
+S.time = 1
+S.add_vertex(2, 2)
+S.add_edge(2, 1, 2)
+S.add_edge(2, 0, 2)
+S.add_edge(0, 2, 2)
+S.add_edge(1, 2, 2)
+S.time = 2
+pass

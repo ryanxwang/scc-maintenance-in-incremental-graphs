@@ -1,8 +1,5 @@
 import unittest
-import test
-import scc_maintainer
-from scc_maintainer.topological_search import TopoSearchSCCMaintainer
-from scc_maintainer.scc_union_find import SCCUnionFind
+from src.topological_search import TopoSearchSCCMaintainer
 
 # change this line to change the implementation tested
 target = TopoSearchSCCMaintainer

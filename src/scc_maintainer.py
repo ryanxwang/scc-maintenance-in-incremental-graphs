@@ -1,4 +1,3 @@
-import scc_maintainer
 from abc import abstractmethod, ABCMeta
 
 class SCC_Maintainer(metaclass=ABCMeta):
