@@ -1,7 +1,8 @@
 from distutils import errors
 from distutils.log import error
-from scc_maintainer import SCC_Maintainer
 import heapq
+import scc_maintainer
+from scc_maintainer.scc_maintainer import SCC_Maintainer
 
 class Vertex:
     def __init__(self, id: int, birthday: int):
@@ -198,14 +199,14 @@ class TopoSearchSCCMaintainer(SCC_Maintainer):
 
         self.__add_edge(Edge(u, v, birthday))
 
-S = TopoSearchSCCMaintainer()
-S.add_vertex(0, 0)
-S.add_vertex(1, 1)
-S.add_edge(1, 0, 1)
-S.time = 1
-S.add_vertex(2, 2)
-S.add_edge(2, 1, 2)
-S.add_edge(2, 0, 2)
-S.add_edge(0, 2, 2)
-S.time = 2
-pass
+# S = TopoSearchSCCMaintainer()
+# S.add_vertex(0, 0)
+# S.add_vertex(1, 1)
+# S.add_edge(1, 0, 1)
+# S.time = 1
+# S.add_vertex(2, 2)
+# S.add_edge(2, 1, 2)
+# S.add_edge(2, 0, 2)
+# S.add_edge(0, 2, 2)
+# S.time = 2
+# pass

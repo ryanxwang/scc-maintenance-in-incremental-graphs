@@ -1,5 +1,6 @@
 import heapq as heapq
-from scc_maintainer import SCC_Maintainer
+import scc_maintainer
+from scc_maintainer.scc_maintainer import SCC_Maintainer
 
 class Vertex:
     def __init__(self, id: int, birthday: int):
