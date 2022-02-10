@@ -1,9 +1,10 @@
 import unittest
+from src.scc_union_find import SCCUnionFind
 from src.topological_search import TopoSearchSCCMaintainer
 
 # change this line to change the implementation tested
-target = TopoSearchSCCMaintainer
-# target = SCCUnionFind
+# target = TopoSearchSCCMaintainer
+target = SCCUnionFind
 
 def try_filtration_scc_count(vertices, edges, time):
     S = target()

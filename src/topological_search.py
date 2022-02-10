@@ -63,7 +63,9 @@ class TopoSearchSCCMaintainer():
 
     def __topological_search(self, u: Vertex, v: Vertex):
         F = []
+        Fstart = 0
         B = []
+        Bstart = 0 # implementing both F and B as queues
         F.append(v)
         B.append(u)
         i, j = self.position[v.id], self.position[u.id]
@@ -126,7 +128,7 @@ class TopoSearchSCCMaintainer():
             BIDs = list(map(lambda x : x.id, B))
 
         # reorder
-        while len(F) != 0:
+        while Fstart < len(F):
             if self.vertices[i] is not None:
                 reachable = False
                 for f in F:
@@ -138,12 +140,13 @@ class TopoSearchSCCMaintainer():
                     self.vertices[i] = None
             
             if self.vertices[i] is None:
-                x = F.pop(0)
+                x = F[Fstart]
+                Fstart = Fstart + 1
                 self.vertices[i] = x
                 self.position[x.id] = i
             i = i - 1
 
-        while len(B) != 0:
+        while Bstart < len(B):
             j = j + 1
             if self.vertices[j] is not None:
                 reachable = False
@@ -156,7 +159,8 @@ class TopoSearchSCCMaintainer():
                     self.vertices[j] = None
             
             if self.vertices[j] is None:
-                x = B.pop(0)
+                x = B[Bstart]
+                Bstart = Bstart + 1
                 self.vertices[j] = x
                 self.position[x.id] = j
         

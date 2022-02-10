@@ -1,6 +1,4 @@
 import heapq as heapq
-import scc_maintainer
-from scc_maintainer.scc_maintainer import SCC_Maintainer
 
 class Vertex:
     def __init__(self, id: int, birthday: int):
@@ -24,7 +22,7 @@ class Edge:
         return self.birthday < other.birthday
 
 
-class SCCUnionFind(SCC_Maintainer):
+class SCCUnionFind():
     def __init__(self):
         self._time = 0
         self.unprocessed_vertices = []
